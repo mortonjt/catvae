@@ -87,6 +87,13 @@ class LinearCatVAE(nn.Module):
         z = self.encoder(hx)
         return z
 
+    def sample_from_posterior_z(self, x):
+        x_ = ilr(self.imputer(x), self.Psi)
+        z_mean = self.encoder(x_)
+        eps = torch.normal(torch.zeros_like(z_mean), 1.0)
+        z_sample = z_mean + eps * torch.exp(0.5 * self.variational_logvars)
+        return z_sample
+
     def forward(self, x):
         hx = ilr(self.imputer(x), self.Psi)
         z_mean = self.encoder(hx)
